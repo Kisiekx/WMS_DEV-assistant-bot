@@ -1,0 +1,27 @@
+{
+  "name": "wms_dev-assistant-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "olda.index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kisiekx/WMS_DEV-assistant-bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kisiekx/WMS_DEV-assistant-bot/issues"
+  },
+  "homepage": "https://github.com/Kisiekx/WMS_DEV-assistant-bot#readme",
+  "dependencies": {
+    "@haileybot/captcha-generator": "^1.7.0",
+    "discord.js": "^14.7.1",
+    "dotenv": "^16.0.3",
+    "mongodb": "^4.13.0",
+    "node-cron": "^3.0.2",
+    "nodemon": "^2.0.20"
+  }
+}
