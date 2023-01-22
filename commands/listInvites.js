@@ -18,7 +18,7 @@ module.exports = {
 
                 let codes = await codesCollection.find({isActive: true})
 
-            if(!(await codes.count()) === 0) {
+            if(!(await codes.count()) == 0) {
 
                 let description = ""
 

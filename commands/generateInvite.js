@@ -31,7 +31,7 @@ function getIdFromChoice(name) {
             return('1066519871904551014')
 
         default:
-            returnfalse
+            return false
     }
 }
 
