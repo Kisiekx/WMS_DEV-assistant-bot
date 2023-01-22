@@ -18,7 +18,7 @@ module.exports = {
 
         const server = message.client.guilds.cache.get('1060903510708858930')
 
-        if (!process == null)
+        if (!(process == null))
 
             if (process.inProcess) {
 
@@ -93,7 +93,7 @@ module.exports = {
 
                         let useNumber = currentCode.numberOfUse + 1
                         let checkActive = (useNumber < currentCode.maxNumberOfUse)
-                        let currentUsedBy = currentCode.usedBy.push([message.author, new Date()])
+                        let currentUsedBy = currentCode.usedBy.concat([message.author, new Date()])
 
                         await codesCollection.updateOne({_id: currentCode._id},
                             {$set: {numberOfUse: useNumber, isActive: checkActive, usedBy: currentUsedBy}})
