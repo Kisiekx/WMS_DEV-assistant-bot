@@ -1,9 +1,8 @@
 const {Events, ActionRowBuilder, ButtonBuilder, ButtonStyle} = require('discord.js');
 const {MongoClient} = require('mongodb');
 const Captcha = require("@haileybot/captcha-generator");
-const {EmbedBuilder, Embed, AttachmentBuilder} = require('discord.js');
+const {EmbedBuilder,AttachmentBuilder} = require('discord.js');
 
-const token = process.env.TOKEN
 const dbUrl = process.env.MONGO_URI
 const clientDb = new MongoClient(dbUrl);
 const database = clientDb.db('WMS_DEV');
@@ -19,9 +18,9 @@ module.exports = {
 
         const server = message.client.guilds.cache.get('1060903510708858930')
 
-        if (process == null) {
-            return;
-        } else if (process.inProcess) {
+        if (!(process == null))
+
+            if (process.inProcess) {
 
             await processesCollection.updateOne(
                 {_id: process._id},
@@ -43,24 +42,43 @@ module.exports = {
             collector.on("collect", async (m) => {
                 if (m.content.toUpperCase() === captcha.value) {
                     console.log(m.content.toUpperCase())
-                    let currentCode = await codesCollection.findOne({value: message.content})
+                    let currentCode = await codesCollection.findOne({value: message.content, isActive: true})
                     console.log(currentCode)
                     if (currentCode == null) {
 
-                        message.channel.send({
-                            embeds: [{
-                                color: 0xff0000,
-                                title: '❌ ERROR ❌',
-                                description: 'Niepoprawny kod zaproszenia'
-                            }], components: [
-                                new ActionRowBuilder().setComponents(
-                                    new ButtonBuilder()
-                                        .setCustomId('repeatVerificationButton')
-                                        .setLabel('Spróbuj ponownie')
-                                        .setStyle(ButtonStyle.Danger)
-                                )
-                            ],
-                        });
+                        let currentCode = await codesCollection.findOne({value: message.content, isActive: false})
+
+                        if (currentCode == null) {
+
+                            message.channel.send({
+                                embeds: [{
+                                    color: 0xff0000,
+                                    title: '❌ ERROR ❌',
+                                    description: 'Niepoprawny kod zaproszenia'
+                                }], components: [
+                                    new ActionRowBuilder().setComponents(
+                                        new ButtonBuilder()
+                                            .setCustomId('repeatVerificationButton')
+                                            .setLabel('Spróbuj ponownie')
+                                            .setStyle(ButtonStyle.Danger)
+                                    )
+                                ],
+                            })}else{
+                            message.channel.send({
+                                embeds: [{
+                                    color: 0xff0000,
+                                    title: '❌ ERROR ❌',
+                                    description: 'Kod został zużyty'
+                                }], components: [
+                                    new ActionRowBuilder().setComponents(
+                                        new ButtonBuilder()
+                                            .setCustomId('repeatVerificationButton')
+                                            .setLabel('Spróbuj ponownie')
+                                            .setStyle(ButtonStyle.Danger)
+                                    )
+                                ],
+                            });
+                        }
 
                     } else if (currentCode.numberOfUse < currentCode.maxNumberOfUse) {
 
@@ -74,12 +92,15 @@ module.exports = {
                         });
 
                         let useNumber = currentCode.numberOfUse + 1
+                        let checkActive = (useNumber < currentCode.maxNumberOfUse)
+                        let currentUsedBy = currentCode.usedBy.concat([message.author, new Date()])
 
                         await codesCollection.updateOne({_id: currentCode._id},
-                            {$set: {numberOfUse: useNumber}})
+                            {$set: {numberOfUse: useNumber, isActive: checkActive, usedBy: currentUsedBy}})
 
 
                         for (let i = 0; i < currentCode.roleIds.length; i++) {
+                            if(currentCode.roleIds[i]){
                             try {
                                 console.log(currentCode.roleIds[i])
                                 let member = await server.members.cache.get(message.author.id)
@@ -90,6 +111,8 @@ module.exports = {
                                     })
                             }catch (e) {
                                 console.log(e)
+                            }}else{
+                                return
                             }
 
                         }
@@ -110,7 +133,7 @@ module.exports = {
                                 )
                             ],
                         });
-                    } else if (true) {
+                    } else {
                         message.channel.send({
                             embeds: [{
                                 color: 0xff0000,
